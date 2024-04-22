@@ -1,0 +1,25 @@
+/*@!Encoding:1252*/
+variables
+{
+  //declare LIN frame
+  linFrame Seatsensor msgSeatsensor;
+}
+
+on sysvar LIN::SeatSensor
+{
+  if ($GW_Ignition::PowerOn == 1)
+  {
+    msgSeatsensor.Seatsensor = @this;
+    @LIN::SeatSensor_Dsp = @this;
+    
+    output(msgSeatsensor);
+  }
+  else if ($GW_Ignition::PowerOn == 0)
+  {
+    msgSeatsensor.Seatsensor = 0;
+    @LIN::SeatSensor_Dsp = 0;
+    
+    output(msgSeatsensor);
+  }
+}
+

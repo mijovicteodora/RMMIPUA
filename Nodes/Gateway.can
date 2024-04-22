@@ -1,0 +1,110 @@
+/*@!Encoding:1252*/
+includes
+{
+  
+}
+
+variables
+{
+  linFrame GW_Ignition ignitionFrame;
+  linFrame Seatsetting seatSetting;
+  linFrame Seatheating seatHeating;
+  linFrame Seatposition seatPosition;
+  linFrame StoreSeatposition storeSeatPosition;
+
+  int saveHeating = 0;
+}
+
+on message Driver_ID
+{
+  seatPosition.Driver = this.Driver;
+  output(seatPosition);
+  
+  storeSeatPosition.Storeposition = this.StoreSeatposition;
+  output(storeSeatPosition);
+}
+
+on message CarLockingSystem
+{
+  ignitionFrame.LockingSystem = this.ActualState;
+  output(ignitionFrame);
+}
+
+on message Ignition
+{
+  ignitionFrame.PowerOn = this.PowerOn;
+  
+  if(this.PowerOn == 0)
+  {
+    seatHeating.Heating = 0;
+    output(seatHeating);
+    
+    @LIN::SeatSensor = 0;
+  }
+  else
+  {
+    seatHeating.Heating = saveHeating;
+    output(seatHeating);
+  }
+  
+  output(ignitionFrame);
+}
+
+on sysvar LIN::Seat_up
+{
+  seatSetting.Seat_up = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Seat_down
+{
+  seatSetting.Seat_down = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Seat_forward
+{
+  seatSetting.Seat_forward = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Seat_back
+{
+  seatSetting.Seat_back = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Seatback_back
+{
+  seatSetting.Seatback_back = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Seatback_forward
+{
+  seatSetting.Seatback_forward = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Head_down
+{
+  seatSetting.Head_down = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Head_up
+{
+  seatSetting.Head_up = @this;
+  output(seatSetting);
+}
+
+on sysvar LIN::Seatheating
+{
+  if ($GW_Ignition::PowerOn == 1)
+  {
+    seatHeating.Heating = @this;
+    saveHeating = @this;
+    
+    output(seatHeating);
+  }
+}
